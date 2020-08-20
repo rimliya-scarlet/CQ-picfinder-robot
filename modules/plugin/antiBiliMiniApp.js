@@ -5,7 +5,7 @@ import CQ from '../CQcode';
 import logError from '../logError';
 import config from '../config';
 
-const setting = config.picfinder.antiBiliMiniApp;
+const setting = config.bot.antiBiliMiniApp;
 const cache = new NodeCache({ stdTTL: 3 * 60 });
 
 function humanNum(num) {
@@ -85,9 +85,10 @@ async function getAvBvFromMsg(msg) {
 }
 
 async function antiBiliMiniApp(context, replyFunc) {
+  const gid = context.group_id;
   const msg = context.message;
   let title = null;
-  if (msg.includes('100951776') && msg.includes('哔哩哔哩')) {
+  if (msg.includes('100951776') && msg.includes('&#91;QQ小程序&#93;哔哩哔哩')) {
     if (setting.despise) {
       replyFunc(context, CQ.img('https://i.loli.net/2020/04/27/HegAkGhcr6lbPXv.png'));
     }
@@ -98,9 +99,11 @@ async function antiBiliMiniApp(context, replyFunc) {
     const param = await getAvBvFromMsg(msg);
     if (param) {
       const { aid, bvid } = param;
-      if (cache.has(aid) || cache.has(bvid)) return;
-      if (aid) cache.set(aid, true);
-      if (bvid) cache.set(bvid, true);
+      if (gid) {
+        const cacheKeys = [`${gid}-${aid}`, `${gid}-${bvid}`];
+        if (cacheKeys.some(key => cache.has(key))) return;
+        [aid, bvid].forEach((id, i) => id && cache.set(cacheKeys[i], true));
+      }
       const reply = await getVideoInfo(param);
       if (reply) {
         replyFunc(context, reply);

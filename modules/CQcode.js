@@ -52,7 +52,6 @@ function img64(base64) {
  * @param {string} title 标题
  * @param {string} content 内容
  * @param {string} image 图片URL
- * @param {string} source 源URL
  * @returns CQ码 分享链接
  */
 function share(url, title, content, image) {
@@ -72,6 +71,16 @@ function at(qq) {
   return `[CQ:at,qq=${qq}] `;
 }
 
+/**
+ * CQ码 回复
+ *
+ * @param {number} id 消息ID
+ * @returns CQ码 回复
+ */
+function reply(id) {
+  return `[CQ:reply,id=${id}]`;
+}
+
 export default {
   escape,
   unescape,
@@ -79,4 +88,5 @@ export default {
   img,
   img64,
   at,
+  reply,
 };
